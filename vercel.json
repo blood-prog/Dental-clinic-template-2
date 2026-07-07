@@ -9,7 +9,8 @@
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/dashboard", "destination": "/ayine-dashboard.html" }
+    { "source": "/dashboard", "destination": "/ayine-dashboard.html" },
+    { "source": "/", "destination": "/ayine-care.html" }
   ],
   "headers": [
     {
