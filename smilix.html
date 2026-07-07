@@ -485,7 +485,7 @@ body { font-family: 'Hanken Grotesk', sans-serif; background-color: #FAFAFA; col
   </div>
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter lg:gap-12">
     <div class="lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant/30 p-8 md:p-12 shadow-sm">
-      <form class="space-y-stack-lg">
+      <form class="space-y-stack-lg" id="appointment-form">
         <div>
           <h2 class="text-headline-md font-headline-md text-on-background mb-6 flex items-center gap-3">
             <span class="material-symbols-outlined text-primary">medical_services</span> Select Service
@@ -579,10 +579,11 @@ body { font-family: 'Hanken Grotesk', sans-serif; background-color: #FAFAFA; col
           </div>
         </div>
         <div class="pt-6">
-          <button class="inline-flex w-full md:w-auto items-center justify-center gap-x-2 rounded-full bg-secondary px-8 py-4 text-label-md font-label-md text-on-secondary shadow-sm hover:bg-secondary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary transition-transform hover:-translate-y-0.5" type="button">
+          <button class="inline-flex w-full md:w-auto items-center justify-center gap-x-2 rounded-full bg-secondary px-8 py-4 text-label-md font-label-md text-on-secondary shadow-sm hover:bg-secondary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary transition-transform hover:-translate-y-0.5" type="submit" id="submit-appt">
             Confirm Appointment
             <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
           </button>
+          <div id="form-message" class="text-sm mt-2 hidden"></div>
           <p class="mt-4 text-sm text-on-surface-variant text-center md:text-left">By booking, you agree to our <a class="underline hover:text-primary" href="#">Terms of Service</a> and <a class="underline hover:text-primary" href="#">Privacy Policy</a>.</p>
         </div>
       </form>
@@ -721,6 +722,79 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   });
+
+  // ========== API HELPER ==========
+  var API_BASE = window.location.origin + '/api';
+
+  function apiFetch(path, options) {
+    var url = API_BASE + path;
+    return fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options
+    }).then(function(r) { return r.json(); }).catch(function() { return null; });
+  }
+
+  // ========== VISIT TRACKING ==========
+  var tracked = sessionStorage.getItem('asm_tracked');
+  if (!tracked) {
+    apiFetch('/analytics', {
+      method: 'POST',
+      body: JSON.stringify({ unique: true })
+    });
+    sessionStorage.setItem('asm_tracked', '1');
+  } else {
+    apiFetch('/analytics', { method: 'POST', body: JSON.stringify({}) });
+  }
+
+  // ========== APPOINTMENT FORM SUBMISSION ==========
+  var apptForm = document.getElementById('appointment-form');
+  if (apptForm) {
+    apptForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      var btn = document.getElementById('submit-appt');
+      var msg = document.getElementById('form-message');
+      btn.disabled = true;
+      btn.innerHTML = 'Sending...';
+
+      var selectedService = document.querySelector('input[name="service"]:checked');
+      var serviceLabels = { cleaning: 'Comprehensive Cleaning', whitening: 'Teeth Whitening', consultation: 'General Consultation', emergency: 'Emergency Care' };
+      var service = selectedService ? (serviceLabels[selectedService.value] || selectedService.value) : 'General Consultation';
+      var timeSelected = document.querySelector('input[name="time"]:checked');
+
+      var data = {
+        patient: (document.getElementById('first-name').value || '') + ' ' + (document.getElementById('last-name').value || ''),
+        date: document.getElementById('date').value || new Date().toISOString().split('T')[0],
+        time: timeSelected ? timeSelected.value : '09:00',
+        service: service,
+        phone: document.getElementById('phone').value || '',
+        email: document.getElementById('email').value || ''
+      };
+
+      if (!data.patient.trim()) {
+        msg.textContent = 'Please enter your name.';
+        msg.className = 'text-sm mt-2 text-error';
+        btn.disabled = false;
+        btn.innerHTML = 'Confirm Appointment<span class="material-symbols-outlined text-[18px]">arrow_forward</span>';
+        return;
+      }
+
+      apiFetch('/appointments', {
+        method: 'POST',
+        body: JSON.stringify(data)
+      }).then(function(result) {
+        if (result && result.id) {
+          msg.textContent = 'Appointment booked successfully! We\'ll confirm shortly.';
+          msg.className = 'text-sm mt-2 text-green-600 font-semibold';
+          apptForm.reset();
+        } else {
+          msg.textContent = 'Something went wrong. Please try again.';
+          msg.className = 'text-sm mt-2 text-error';
+        }
+        btn.disabled = false;
+        btn.innerHTML = 'Confirm Appointment<span class="material-symbols-outlined text-[18px]">arrow_forward</span>';
+      });
+    });
+  }
 
   // ========== MARQUEE ANIMATION ==========
   var track = document.getElementById('marquee-track');

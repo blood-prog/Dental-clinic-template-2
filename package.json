@@ -1,0 +1,13 @@
+{
+  "name": "asm-smile",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "vercel-build": "echo 'static'"
+  },
+  "dependencies": {
+    "@vercel/kv": "^2.0.0"
+  }
+}

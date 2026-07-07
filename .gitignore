@@ -1,0 +1,53 @@
+node_modules/
+.next/
+.env
+.env.local
+data/
+
+# Windows system files
+NTUSER.DAT*
+ntuser.*
+Application Data/
+AppData/
+Cookies/
+Local Settings/
+Menu Démarrer/
+Mes documents/
+Modèles/
+Recent/
+SendTo/
+Voisinage d'impression/
+Voisinage réseau/
+Favorites/
+Links/
+Contacts/
+Saved Games/
+Searches/
+OneDrive/
+
+# IDE / tooling
+.vscode/
+.idea/
+.agents/
+.antigravity/
+.antigravity-ide/
+.cache/
+.cline/
+.codex/
+.config/
+.copilot/
+.cursor/
+.gemini/
+.idlerc/
+.local/
+.ms-ad/
+.securecoder/
+.skiko/
+.ssh/
+.supabase/
+.kimi/
+
+# Temp / generated
+*.xml
+doctor-portrait.jpg
+skills-lock.json
