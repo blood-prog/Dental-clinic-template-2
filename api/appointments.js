@@ -1,6 +1,6 @@
 const { list, push, update, remove, requireAuth } = require('./store');
 
-const KEY = 'asm_appointments';
+const KEY = 'ayinecare_appointments';
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

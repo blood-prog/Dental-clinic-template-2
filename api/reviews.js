@@ -1,6 +1,6 @@
 const { list, push, requireAuth } = require('./store');
 
-const KEY = 'asm_reviews';
+const KEY = 'ayinecare_reviews';
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -24,7 +24,7 @@ module.exports = async (req, res) => {
       const newReview = {
         id: Date.now(),
         name: name,
-        category: category || 'Dentistry',
+        category: category || 'General Medicine',
         rating: Math.min(5, Math.max(1, parseInt(rating) || 5)),
         text: text,
         createdAt: new Date().toISOString()

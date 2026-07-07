@@ -1,6 +1,6 @@
 const { get, set, list, requireAuth } = require('./store');
 
-const VISITS_KEY = 'asm_visits';
+const VISITS_KEY = 'ayinecare_visits';
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
     if (req.method === 'GET') {
       if (!requireAuth(req, res)) return;
       const visits = await get(VISITS_KEY);
-      const appointments = await list('asm_appointments');
+      const appointments = await list('ayinecare_appointments');
       const totalAppts = appointments.length;
       const confirmed = appointments.filter(a => a.status === 'confirmed').length;
       const totalVisits = visits ? visits.reduce((s, d) => s + d.count, 0) : 0;
